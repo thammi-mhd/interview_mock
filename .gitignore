@@ -1,0 +1,139 @@
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+virtualenv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+.vscode-server/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+pgdata/
+postgres_data/
+
+# Logs
+*.log
+logs/
+output.log
+
+# Temporary files
+*.tmp
+.cache/
+dist/
+build/
+*.egg-info/
+scratch.py
+temp/
+tmp/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+.vercel/
+
+# Build outputs
+*.min.js
+*.min.css
+
+# OS-specific files
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+ehthumbs.db
+Thumbs.db
+*.lnk
+$RECYCLE.BIN/
+
+# Linux
+.Xauthority
+.Xdefaults
+
+# IDE-specific
+*.code-workspace
+.gradle
+.idea/
+*.iml
+out/
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Package lock files (optional - uncomment if needed for reproducibility)
+# package-lock.json
+# yarn.lock
+
+# Audio/Media temporary files
+*.tmp.wav
+*.tmp.mp3
+*.temp.wav
+
+# Backend-specific
+*.pid
+pid.lock
+uvicorn.pid
+
+# Frontend-specific
+.cache
+.eslintcache
+
+# Misc
+.turbo/
+.env*.local
+.pem
+
+# Machine Learning Models & Data
+speech-recognition/whisper-finetuned/
+speech-recognition/dataset/
+*.safetensors
+*.bin
+
+# Test Uploads
+test_audio_uploads/
+test_model.py

@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #06070a;
+    --surface: #0e1017;
+    --s2: #161922;
+    --border: rgba(255, 255, 255, 0.06);
+    --accent: #c8f04d;
+    --text: #f2f2f0;
+    --muted: #5a6175;
+    --muted2: #8892a4;
+    --red: #ff4d6d;
+    --green: #3dffc0;
+    --radius: 18px;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-text font-outfit antialiased selection:bg-accent selection:text-background;
+    overflow-x: hidden;
+  }
+  
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.5;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-accent text-[#06070a] font-outfit font-bold rounded-full transition-all duration-200 inline-flex items-center gap-2 hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(200,240,77,0.3)] disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none;
+  }
+  
+  .btn-outline {
+    @apply px-6 py-3 border border-border/50 text-text font-outfit font-medium rounded-full transition-all duration-200 inline-flex items-center gap-2 hover:border-accent/40 hover:text-accent bg-white/5 backdrop-blur-md;
+  }
+  
+  .input-field {
+    @apply w-full bg-s2 border border-border rounded-xl px-4 py-3.5 text-text font-outfit outline-none transition-colors duration-200 hover:border-border/80 focus:border-accent/50 placeholder:text-muted;
+  }
+}

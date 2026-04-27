@@ -1,0 +1,117 @@
+# ===========================
+# Virtual environments
+# ===========================
+venv/
+env/
+ENV/
+.venv/
+virtualenv/
+
+# ===========================
+# Python cache
+# ===========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.pytype/
+.dmypy.json
+dmypy.json
+
+# ===========================
+# Environment variables
+# ===========================
+.env
+.env.local
+.env.*.local
+.env.production.local
+
+# ===========================
+# IDE / Editor
+# ===========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.vscode-server/
+
+# ===========================
+# Database files
+# ===========================
+*.db
+*.sqlite
+*.sqlite3
+pgdata/
+postgres_data/
+
+# ===========================
+# Logs
+# ===========================
+*.log
+logs/
+output.log
+
+# ===========================
+# Build & Distribution
+# ===========================
+dist/
+build/
+*.egg-info/
+.eggs/
+*.whl
+
+# ===========================
+# Temporary files
+# ===========================
+*.tmp
+.cache/
+scratch.py
+temp/
+tmp/
+
+# ===========================
+# FastAPI specific
+# ===========================
+*.pid
+pid.lock
+uvicorn.pid
+
+# ===========================
+# OS-specific
+# ===========================
+.AppleDouble
+.LSOverride
+._*
+$RECYCLE.BIN/
+logs/
+
+# ===========================
+# Build / Temp
+# ===========================
+*.tmp
+.cache/
+dist/
+build/
+*.egg-info/
+
+# ===========================
+# Docker (not needed on Render)
+# ===========================
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# ===========================
+# Scratch / Dev files
+# ===========================
+scratch.py
+scratch/

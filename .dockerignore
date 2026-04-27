@@ -1,0 +1,37 @@
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Frontend (deployed separately on Vercel)
+frontend-next/
+
+# Git
+.git/
+.gitignore
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Environment files (secrets injected via Docker env vars)
+.env
+.env.*
+
+# Docker files (no need to copy into image)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Misc
+*.md
+*.log
+scratch.py
+render.yaml
