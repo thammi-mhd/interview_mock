@@ -193,3 +193,31 @@ async def reset_password(db, token: str, new_password: str):
     db.commit()
     
     return {"message": "Password reset successfully! You can now login."}, 200
+
+
+async def update_user_profile(db, user_id: int, name: str = None, current_password: str = None, new_password: str = None):
+    """Update user profile (name and/or password)"""
+    user = db.query(User).filter(User.id == user_id).first()
+    
+    if not user:
+        return {"error": "User not found"}, 404
+    
+    # If changing password, verify current password
+    if new_password:
+        if not current_password:
+            return {"error": "Current password is required to change password"}, 400
+        
+        if not verify_password(current_password, user.hashed_password):
+            return {"error": "Current password is incorrect"}, 401
+        
+        # Update password
+        user.hashed_password = hash_password(new_password)
+    
+    # Update name if provided
+    if name and name.strip():
+        user.name = name.strip()
+    
+    db.commit()
+    db.refresh(user)
+    
+    return {"success": True, "message": "Profile updated successfully", "name": user.name}, 200

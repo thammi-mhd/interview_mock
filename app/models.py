@@ -36,6 +36,8 @@ class InterviewSession(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     role = Column(String, nullable=False)  # e.g., "Python Developer", "Frontend Developer"
+    interview_type = Column(String, default="Technical", nullable=False)  # Technical, HR, Mixed
+    difficulty = Column(String, default="Medium", nullable=False)  # Easy, Medium, Hard
     status = Column(String, default="ongoing")  # ongoing, completed
     total_score = Column(Integer, nullable=True, default=0)
     duration_minutes = Column(Integer, nullable=True, default=20)

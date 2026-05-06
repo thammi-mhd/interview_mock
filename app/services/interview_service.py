@@ -3,7 +3,7 @@ from app.models import InterviewSession, InterviewQuestion
 from app.services.ai_service import evaluate_answer, generate_interview_report
 
 
-async def start_interview(db, user_id: int, role: str, questions: list, duration_minutes: int = 20):
+async def start_interview(db, user_id: int, role: str, questions: list, interview_type: str = "Technical", difficulty: str = "Medium", duration_minutes: int = 20):
     """
     Start a new interview session and pre-store all questions in the DB.
     This ensures question consistency across the entire session.
@@ -17,7 +17,14 @@ async def start_interview(db, user_id: int, role: str, questions: list, duration
         return {"error": "You already have an ongoing interview. End it first.", "session_id": ongoing.id}, 409
 
     # Create session
-    session = InterviewSession(user_id=user_id, role=role, status="ongoing", duration_minutes=duration_minutes)
+    session = InterviewSession(
+        user_id=user_id, 
+        role=role, 
+        interview_type=interview_type,
+        difficulty=difficulty,
+        status="ongoing", 
+        duration_minutes=duration_minutes
+    )
     db.add(session)
     db.commit()
     db.refresh(session)
@@ -190,6 +197,8 @@ async def get_interview_history(db, user_id: int):
         history.append({
             "session_id": s.id,
             "role": s.role,
+            "interview_type": s.interview_type,
+            "difficulty": s.difficulty,
             "status": s.status,
             "total_score": s.total_score,
             "max_possible_score": max_possible,

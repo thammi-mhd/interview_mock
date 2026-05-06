@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import { requireAuth, getToken, getUser, clearAuth } from "@/lib/auth";
+import ProfileMenu from "@/components/ProfileMenu";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -13,6 +14,13 @@ export default function DashboardPage() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState("");
+  const [stats, setStats] = useState({
+    totalInterviews: 0,
+    averageScore: 0,
+    completedInterviews: 0,
+    bestScore: 0,
+    lastInterviewDate: null,
+  });
 
   useEffect(() => {
     if (!requireAuth(router)) return;
@@ -27,7 +35,9 @@ export default function DashboardPage() {
       const response = await axios.get(`${API_URL}/interview/history`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setHistory(response.data.sessions || []);
+      const sessions = response.data.sessions || [];
+      setHistory(sessions);
+      calculateStats(sessions);
     } catch (error) {
       if (error.response?.status === 401) {
         clearAuth();
@@ -40,17 +50,43 @@ export default function DashboardPage() {
     }
   };
 
+  const calculateStats = (sessions) => {
+    if (sessions.length === 0) {
+      setStats({
+        totalInterviews: 0,
+        averageScore: 0,
+        completedInterviews: 0,
+        bestScore: 0,
+        lastInterviewDate: null,
+      });
+      return;
+    }
+
+    const completed = sessions.filter((s) => s.status === "completed");
+    const scores = completed.map(
+      (s) => (s.total_score / (s.max_possible_score || 1)) * 100,
+    );
+    const avgScore =
+      scores.length > 0
+        ? (scores.reduce((a, b) => a + b) / scores.length).toFixed(1)
+        : 0;
+    const bestScore = scores.length > 0 ? Math.max(...scores).toFixed(1) : 0;
+
+    setStats({
+      totalInterviews: sessions.length,
+      averageScore: avgScore,
+      completedInterviews: completed.length,
+      bestScore: bestScore,
+      lastInterviewDate: sessions[0]?.started_at || null,
+    });
+  };
+
   const handleViewDetails = (sessionId) => {
     router.push(`/interview/results/${sessionId}`);
   };
 
   const handleStartInterview = () => {
     router.push("/interview");
-  };
-
-  const handleLogout = () => {
-    clearAuth();
-    router.push("/auth/login");
   };
 
   return (
@@ -101,21 +137,13 @@ export default function DashboardPage() {
               Intervuo
             </span>
           </Link>
-          <div className="flex gap-3 items-center">
-            <Link
-              href="/auth/login"
-              onClick={handleLogout}
-              className="px-5 py-2 border border-border/50 rounded-full text-text text-sm font-medium hover:border-accent/30 hover:text-accent transition-colors"
-            >
-              Logout
-            </Link>
-          </div>
+          <ProfileMenu />
         </nav>
 
         {/* Header */}
         <div className="mb-12">
           <h1 className="font-bebas text-[clamp(40px,8vw,80px)] leading-tight tracking-wide text-text mb-3">
-            Welcome, <span className="text-accent">{userName}</span>! 👋
+            Welcome back, <span className="text-accent">{userName}</span>
           </h1>
           <p className="text-muted2 text-lg max-w-[500px]">
             Track your interview practice and improve your skills with
@@ -123,18 +151,66 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Start New Interview Button */}
-        <button
-          onClick={handleStartInterview}
-          className="mb-12 w-full md:w-auto px-8 py-4 bg-accent text-[#06070a] font-bold text-lg rounded-2xl hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(200,240,77,0.25)] transition-all"
-        >
-          🚀 Start New Interview
-        </button>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
+          <div className="p-4 rounded-xl border border-border bg-surface/30 backdrop-blur">
+            <p className="text-muted2 text-xs uppercase tracking-wide mb-2">
+              Total Interviews
+            </p>
+            <p className="font-bebas text-4xl tracking-wide text-accent">
+              {stats.totalInterviews}
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-border bg-surface/30 backdrop-blur">
+            <p className="text-muted2 text-xs uppercase tracking-wide mb-2">
+              Average Score
+            </p>
+            <p className="font-bebas text-4xl tracking-wide text-accent">
+              {stats.averageScore}%
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-border bg-surface/30 backdrop-blur">
+            <p className="text-muted2 text-xs uppercase tracking-wide mb-2">
+              Best Score
+            </p>
+            <p className="font-bebas text-4xl tracking-wide text-accent">
+              {stats.bestScore}%
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-border bg-surface/30 backdrop-blur">
+            <p className="text-muted2 text-xs uppercase tracking-wide mb-2">
+              Completed
+            </p>
+            <p className="font-bebas text-4xl tracking-wide text-accent">
+              {stats.completedInterviews}
+            </p>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="mb-12 p-8 rounded-2xl border border-border bg-gradient-to-r from-accent/10 to-transparent">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div>
+              <h2 className="text-2xl font-bebas tracking-wide text-text mb-2">
+                Ready for your next challenge?
+              </h2>
+              <p className="text-muted2">
+                Start a new interview session and track your progress over time.
+              </p>
+            </div>
+            <button
+              onClick={handleStartInterview}
+              className="flex-shrink-0 px-8 py-4 bg-accent text-[#06070a] font-bold text-lg rounded-2xl hover:shadow-[0_12px_30px_rgba(200,240,77,0.25)] transition-all whitespace-nowrap"
+            >
+              Start New Interview
+            </button>
+          </div>
+        </div>
 
         {/* Interview History */}
         <div>
           <h2 className="font-bebas text-4xl tracking-wide text-text mb-8">
-            Interview History
+            Recent Interviews
           </h2>
 
           {loading ? (
@@ -161,8 +237,22 @@ export default function DashboardPage() {
             </div>
           ) : history.length === 0 ? (
             <div className="text-center py-12 border border-border rounded-2xl bg-surface/30">
-              <p className="text-muted2 text-lg">
-                No interviews yet. Start your first interview!
+              <svg
+                className="w-16 h-16 mx-auto text-muted2 mb-4 opacity-50"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm0 0V6m12 13c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm0 0V6"
+                />
+              </svg>
+              <p className="text-muted2 text-lg mb-4">No interviews yet</p>
+              <p className="text-muted2 text-sm">
+                Start your first interview to see your progress here.
               </p>
             </div>
           ) : (
@@ -205,8 +295,7 @@ export default function DashboardPage() {
                         </div>
                         <p className="text-muted2 text-sm">
                           {new Date(session.started_at).toLocaleDateString()} •{" "}
-                          {session.answered_questions}/{session.total_questions}{" "}
-                          questions
+                          {session.interview_type} • {session.difficulty}
                         </p>
                       </div>
                       <div className="flex items-center gap-6 md:gap-12">
@@ -220,23 +309,21 @@ export default function DashboardPage() {
                             {percentage}%
                           </p>
                         </div>
-                        {session.status === "completed" && (
-                          <div className="text-accent group-hover:translate-x-1 transition-transform">
-                            <svg
-                              className="w-6 h-6"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 5l7 7-7 7"
-                              />
-                            </svg>
-                          </div>
-                        )}
+                        <div className="text-accent group-hover:translate-x-1 transition-transform">
+                          <svg
+                            className="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -246,47 +333,75 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Stats */}
-        {history.length > 0 && (
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-6 rounded-2xl border border-border bg-surface/30 backdrop-blur">
-              <p className="text-muted2 text-xs uppercase tracking-wide mb-3">
-                Total Interviews
-              </p>
-              <p className="font-bebas text-5xl tracking-wide text-accent">
-                {history.length}
-              </p>
-            </div>
-            <div className="p-6 rounded-2xl border border-border bg-surface/30 backdrop-blur">
-              <p className="text-muted2 text-xs uppercase tracking-wide mb-3">
-                Average Score
-              </p>
-              <p className="font-bebas text-5xl tracking-wide text-accent">
-                {history.length > 0
-                  ? (
-                      (history.reduce(
-                        (sum, s) => sum + (s.total_score || 0),
-                        0,
-                      ) /
-                        history.reduce(
-                          (sum, s) => sum + (s.max_possible_score || 1),
-                          1,
-                        )) *
-                      100
-                    ).toFixed(1) + "%"
-                  : "-"}
-              </p>
-            </div>
-            <div className="p-6 rounded-2xl border border-border bg-surface/30 backdrop-blur">
-              <p className="text-muted2 text-xs uppercase tracking-wide mb-3">
-                Completed
-              </p>
-              <p className="font-bebas text-5xl tracking-wide text-accent">
-                {history.filter((s) => s.status === "completed").length}
-              </p>
-            </div>
+        {/* Help Section */}
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 rounded-xl border border-border bg-surface/30">
+            <svg
+              className="w-8 h-8 text-accent mb-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+            <h3 className="font-bebas text-lg text-text mb-2">
+              Get Started Quickly
+            </h3>
+            <p className="text-muted2 text-sm">
+              Choose your role and difficulty level, then start practicing with
+              real-time feedback.
+            </p>
           </div>
-        )}
+          <div className="p-6 rounded-xl border border-border bg-surface/30">
+            <svg
+              className="w-8 h-8 text-accent mb-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+            <h3 className="font-bebas text-lg text-text mb-2">
+              Track Progress
+            </h3>
+            <p className="text-muted2 text-sm">
+              View your interview history and detailed feedback to identify
+              areas for improvement.
+            </p>
+          </div>
+          <div className="p-6 rounded-xl border border-border bg-surface/30">
+            <svg
+              className="w-8 h-8 text-accent mb-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <h3 className="font-bebas text-lg text-text mb-2">
+              Improve Skills
+            </h3>
+            <p className="text-muted2 text-sm">
+              Get AI-powered feedback and personalized recommendations to ace
+              your interviews.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

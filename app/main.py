@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from .database import Base, Engine
 from .models import User, InterviewSession, InterviewQuestion
-from .routes import auth, interview
+from .routes import auth, interview, user
 from app.utils.security import limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
@@ -59,6 +59,7 @@ Base.metadata.create_all(bind=Engine)
 
 # Routers
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(user.router, prefix="/user", tags=["User"])
 app.include_router(interview.router, prefix="/interview", tags=["Interview"])
 
 

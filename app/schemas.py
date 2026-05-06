@@ -53,6 +53,19 @@ class ResetPasswordRequest(BaseModel):
         return v
 
 
+class UpdateProfileRequest(BaseModel):
+    name: Optional[str] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None
+
+    @field_validator("new_password")
+    @classmethod
+    def password_strength(cls, v):
+        if v and len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return v
+
+
 class verify_otp(BaseModel):
     email: EmailStr
     otp: str

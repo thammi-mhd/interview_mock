@@ -210,7 +210,8 @@ async def start_interview_route(
     questions = q_result["questions"]
 
     result, code = await start_interview(
-        db, current_user["user_id"], interview_req.role, questions, interview_req.duration_minutes
+        db, current_user["user_id"], interview_req.role, questions, 
+        interview_req.interview_type, interview_req.difficulty, interview_req.duration_minutes
     )
     if code != 201:
         raise HTTPException(status_code=code, detail=result.get("error"))
