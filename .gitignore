@@ -129,9 +129,14 @@ uvicorn.pid
 .pem
 
 # Machine Learning Models & Data
+speech-recognition/whisper-finetuned/checkpoint-29/optimizer.pt
+speech-recognition/whisper-finetuned/checkpoint-29/scheduler.pt
+speech-recognition/whisper-finetuned/checkpoint-29/rng_state.pth
 speech-recognition/dataset/
 *.safetensors
 *.bin
+*.pt
+*.pth
 
 # Test Uploads
 test_audio_uploads/
