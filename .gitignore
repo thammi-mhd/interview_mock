@@ -129,7 +129,6 @@ uvicorn.pid
 .pem
 
 # Machine Learning Models & Data
-speech-recognition/whisper-finetuned/
 speech-recognition/dataset/
 *.safetensors
 *.bin
